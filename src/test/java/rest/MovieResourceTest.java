@@ -1,6 +1,6 @@
 package rest;
 
-import entities.entity;
+import entities.Movie;
 import utils.EMF_Creator;
 import io.restassured.RestAssured;
 import static io.restassured.RestAssured.given;
@@ -24,7 +24,7 @@ import utils.EMF_Creator.Strategy;
 
 //Uncomment the line below, to temporarily disable this test
 //@Disabled
-public class RestTest {
+public class MovieResourceTest {
 
     private static final int SERVER_PORT = 7777;
     private static final String SERVER_URL = "http://localhost/api";
@@ -34,6 +34,8 @@ public class RestTest {
     static final URI BASE_URI = UriBuilder.fromUri(SERVER_URL).port(SERVER_PORT).build();
     private static HttpServer httpServer;
     private static EntityManagerFactory emf;
+    private Movie m1;
+    private Movie m2;
 
     static HttpServer startServer() {
         ResourceConfig rc = ResourceConfig.forApplication(new ApplicationConfig());
@@ -64,15 +66,17 @@ public class RestTest {
     }
     
     // Setup the DataBase (used by the test-server and this test) in a known state BEFORE EACH TEST
-    //TODO -- Make sure to change the script below to use YOUR OWN entity class
+    //TODO -- Make sure to change the script below to use YOUR OWN Movie class
     @BeforeEach
     public void setUp() {
         EntityManager em = emf.createEntityManager();
+        m1 = new Movie(1933, "Hamlet", new String[]{"Jepser Nielsen","Henrik Poulsen","Freddy Fræk"});
+        m2 = new Movie(1933, "Bambie", new String[]{"Ulla Tørnæse","Pia Køl","Freddy Fræk"});
         try {
             em.getTransaction().begin();
-            em.createNamedQuery("RenameMe.deleteAllRows").executeUpdate();
-            em.persist(new entity("Some txt","More text"));
-            em.persist(new entity("aaa","bbb"));
+            em.createNamedQuery("Movie.deleteAllRows").executeUpdate();
+            em.persist(m1);
+            em.persist(m2);
            
             em.getTransaction().commit();
         } finally {
@@ -83,27 +87,9 @@ public class RestTest {
     @Test
     public void testServerIsUp() {
         System.out.println("Testing is server UP");
-        given().when().get("/xxx").then().statusCode(200);
+        given().when().get("/movie").then().statusCode(200);
     }
    
     //This test assumes the database contains two rows
-    @Test
-    public void testDummyMsg() throws Exception {
-        given()
-        .contentType("application/json")
-        .get("/xxx/").then()
-        .assertThat()
-        .statusCode(HttpStatus.OK_200.getStatusCode())
-        .body("msg", equalTo("Hello World"));   
-    }
-    
-    @Test
-    public void testCount() throws Exception {
-        given()
-        .contentType("application/json")
-        .get("/xxx/count").then()
-        .assertThat()
-        .statusCode(HttpStatus.OK_200.getStatusCode())
-        .body("count", equalTo(2));   
-    }
+  
 }

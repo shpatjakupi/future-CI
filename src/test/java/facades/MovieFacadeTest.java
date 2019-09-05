@@ -1,7 +1,7 @@
 package facades;
 
 import utils.EMF_Creator;
-import entities.entity;
+import entities.Movie;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.AfterAll;
@@ -16,12 +16,14 @@ import utils.EMF_Creator.Strategy;
 
 //Uncomment the line below, to temporarily disable this test
 //@Disabled
-public class FacadeExampleTest {
+public class MovieFacadeTest {
 
     private static EntityManagerFactory emf;
-    private static entityFacade facade;
+    private static MovieFacade facade;
+    private Movie m1 = new Movie(1933, "Hamlet", new String[]{"Jesper Nielsen","Henrik Poulsen","Freddy Fræk"});
+    private Movie m2 = new Movie(1933, "Bambie", new String[]{"Ulla Tørnæse","Pia Køl","Freddy Fræk"});
 
-    public FacadeExampleTest() {
+    public MovieFacadeTest() {
     }
 
     //@BeforeAll
@@ -32,7 +34,7 @@ public class FacadeExampleTest {
                 "dev",
                 "ax2",
                 EMF_Creator.Strategy.CREATE);
-        facade = entityFacade.getFacadeExample(emf);
+        facade = MovieFacade.getFacadeExample(emf);
     }
 
     /*   **** HINT **** 
@@ -44,7 +46,7 @@ public class FacadeExampleTest {
     @BeforeAll
     public static void setUpClassV2() {
        emf = EMF_Creator.createEntityManagerFactory(DbSelector.TEST,Strategy.DROP_AND_CREATE);
-       facade = entityFacade.getFacadeExample(emf);
+       facade = MovieFacade.getFacadeExample(emf);
     }
 
     @AfterAll
@@ -53,15 +55,15 @@ public class FacadeExampleTest {
     }
 
     // Setup the DataBase in a known state BEFORE EACH TEST
-    //TODO -- Make sure to change the script below to use YOUR OWN entity class
+    //TODO -- Make sure to change the script below to use YOUR OWN Movie class
     @BeforeEach
     public void setUp() {
         EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
-            em.createNamedQuery("RenameMe.deleteAllRows").executeUpdate();
-            em.persist(new entity("Some txt", "More text"));
-            em.persist(new entity("aaa", "bbb"));
+            em.createNamedQuery("Movie.deleteAllRows").executeUpdate();
+            em.persist(m1);
+            em.persist(m2);
 
             em.getTransaction().commit();
         } finally {
@@ -77,7 +79,7 @@ public class FacadeExampleTest {
     // TODO: Delete or change this method 
     @Test
     public void testAFacadeMethod() {
-        assertEquals(2, facade.getEntityCount(), "Expects two rows in the database");
+        assertEquals(2, facade.getMovieCount(), "Expects two rows in the database");
     }
 
 }
